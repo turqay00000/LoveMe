@@ -27,6 +27,7 @@ export default function Home() {
   const typewriterIntervalRef = useRef(null);
   const keyboardSafetyTimerRef = useRef(null);
   const audioInitializedRef = useRef(false);
+  const decryptButtonRef = useRef(null);
 
   const hackerPhrases = [
     "[ANALYSIS] Aysun'un gülüşü sistemdeki tüm açıkları kapatıyor...",
@@ -115,9 +116,14 @@ export default function Home() {
   };
 
   const scrollToBottom = () => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
+    const doScroll = () => {
+      if (terminalRef.current) {
+        terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+      }
+    };
+    doScroll();
+    requestAnimationFrame(doScroll);
+    setTimeout(doScroll, 60);
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
@@ -264,7 +270,10 @@ export default function Home() {
             scrollToBottom();
           }, 100 * idx);
         });
-        setTimeout(() => setShowDecryptButton(true), 500);
+        setTimeout(() => {
+          setShowDecryptButton(true);
+          setTimeout(() => decryptButtonRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 120);
+        }, 500);
       }
     };
 
@@ -508,8 +517,11 @@ export default function Home() {
             width: '100%',
             height: '100%',
             overflowY: 'auto',
-            padding: '20px',
-            boxSizing: 'border-box'
+            padding: '16px 18px 130px 18px',
+            boxSizing: 'border-box',
+            fontSize: 'clamp(14px, 4.2vw, 20px)',
+            lineHeight: 1.18,
+            WebkitOverflowScrolling: 'touch'
           }}
         >
           {terminalLines.map((line) => (
@@ -549,7 +561,18 @@ export default function Home() {
           )}
 
           {showDecryptButton && (
-            <div style={{ marginTop: '20px' }}>
+            <div
+              ref={decryptButtonRef}
+              style={{
+                marginTop: '20px',
+                marginBottom: '70px',
+                position: 'sticky',
+                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 78px)',
+                zIndex: 50,
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+            >
               <button
                 onClick={() => setStage(4)}
                 onMouseEnter={() => setIsHoveringButton(true)}
@@ -561,7 +584,9 @@ export default function Home() {
                   borderRadius: '8px',
                   color: isHoveringButton ? '#ff5588' : '#ff3366',
                   fontFamily: 'monospace',
-                  fontSize: '16px',
+                  fontSize: 'clamp(14px, 4vw, 16px)',
+                  minHeight: '46px',
+                  maxWidth: '92vw',
                   cursor: 'pointer',
                   opacity: showDecryptButton ? 1 : 0,
                   transition: 'all 0.3s ease',
@@ -602,7 +627,8 @@ export default function Home() {
                   outline: 'none',
                   color: '#00ff00',
                   fontFamily: 'monospace',
-                  fontSize: '16px',
+                  fontSize: 'inherit',
+                  minWidth: 0,
                   flex: 1,
                   caretColor: '#00ff00'
                 }}
